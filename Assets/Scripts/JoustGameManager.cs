@@ -10,7 +10,7 @@ public class JoustGameManager : MonoBehaviour
 {
     [Header("Core Components")]
     public TimingBarController timingBar;       // Reference to the timing bar controller
-    public JoustUIController ui;                // UI controller for displaying countdowns and results
+    public JoustUiController ui;                // UI controller for displaying countdowns and results
 
     [Header("Round Settings")]
     public float countdownTime = 3f;           // Duration of the pre-round countdown
@@ -37,6 +37,7 @@ public class JoustGameManager : MonoBehaviour
         roundActive = false;
 
         ui.HideResultText();    // Clear previous round text
+        ui.SetTimingBarDifficulty(currentOpponent); // Set timing bar difficulty
         ui.ShowCountdown(countdownTime, BeginJoust);   // Countdown before jousst
     }
 

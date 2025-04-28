@@ -4,17 +4,15 @@ using UnityEngine;
 
 
 /// <summary>
-/// Controls the horizontal timning bar mechanic used in the jousting game.
-/// A marker moves from left to right, and the player must press a key to stop it within a target zone.
-/// The result is evaluated based on whether the marker lands in a green zone or sweet spot.
+/// Controls the horizontal timing bar mechanic used in the jousting game.
+/// Moves a marker across a fixed bar and evaluates player input based on predefined zones.
+/// Now works with one static bar image (including green zone and sweet spot) and a separate marker.
 /// </summary>
 public class TimingBarController : MonoBehaviour
 {
     [Header("UI References")]
     public RectTransform marker;        // The moving marker (e.g., a small arrow or box)
     public RectTransform barArea;       // The full width of the timing bar container
-    public RectTransform greenZone;     // The general "safe" zone
-    public RectTransform sweetSpot;     // The "perfect timing" sweet spot
 
     [Header("Timing Settings")]
     public float markerSpeed = 1.0f;    // How fast the marker moves (in normalized units per second
@@ -22,6 +20,16 @@ public class TimingBarController : MonoBehaviour
         
     private float barWidth;             // Cached width of the barArea for calculations
     private float markerProgress;       // 0 to 1 progress across the bar (0 = left, 1 = right
+
+    [Header("Zone Settings")]
+    [Range(0f, 1f)]
+    public float greenZoneStart = 0.45f;    // Normalised start position of green zone
+    [Range(0f, 1f)]
+    public float greenZoneEnd = 0.55f;      // Normalised end position of green zone
+    [Range(0f, 1f)]
+    public float sweetSpotCenter = 0.5f;    // Normalised center of sweet spot
+    public float sweetSpotRange = 0.02f;    // Range around center of sweet spot
+
 
     // Delegate for broadcasting result once marker stops
     public System.Action<HitResult> OnMarkerStopped;
@@ -75,27 +83,24 @@ public class TimingBarController : MonoBehaviour
     {
         isMoving = false;
 
-        float markerX = marker.anchoredPosition.x;
-
-        // Get bounds of green zone
-        float greenStart = greenZone.anchoredPosition.x - greenZone.rect.width / 2;
-        float greenEnd = greenZone.anchoredPosition.x + greenZone.rect.width / 2;
-
-        // Get bounds of sweet spot (inside green zone)
-        float sweetStart = sweetSpot.anchoredPosition.x - sweetSpot.rect.width / 2;
-        float sweetEnd = sweetSpot.anchoredPosition.x + sweetSpot.rect.width / 2;
+        float markerNormalizedPosition = markerProgress; // Already 0-1
 
         HitResult result;
 
-        // Determine result based on where the marker landed
-        if (markerX >= sweetStart && markerX <= sweetEnd)
+        if (markerNormalizedPosition >= (sweetSpotCenter - sweetSpotRange) &&
+              markerNormalizedPosition <= (sweetSpotCenter + sweetSpotRange))
+        {
             result = HitResult.SweetSpot;
-        else if (markerX >= greenStart && markerX <= greenEnd)
+        }
+        else if (markerNormalizedPosition >= greenZoneStart && markerNormalizedPosition <= greenZoneEnd)
+        {
             result = HitResult.GreenZone;
+        }
         else
+        {
             result = HitResult.Miss;
+        }
 
-        // Broadcasst result to any listeners (likely the JoustGameManager)
         OnMarkerStopped?.Invoke(result);
     }
 
