@@ -45,6 +45,9 @@ public class JoustGameManager : MonoBehaviour
         roundTimer = 0f;
         roundActive = false;
 
+        // Sets which timing bar to be used (Easy, Medium or Hard)
+        ui.SetTimingBarDifficulty(currentOpponent);
+
         // Reset UI
         ui.HideResultText();
 
