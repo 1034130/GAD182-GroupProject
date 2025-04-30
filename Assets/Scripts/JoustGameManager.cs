@@ -11,6 +11,12 @@ public class JoustGameManager : MonoBehaviour
     [Header("Core Components")]
     public TimingBarController timingBar;       // Reference to the timing bar controller
     public JoustUiController ui;                // UI controller for displaying countdowns and results
+    public KnightMovement playerKnight;        // Controller for Knight movement (Player knight)
+    public KnightMovement opponentKnight;       // Controller for Knight movement (Opponent knight)
+    public Transform centerPosition;            // Center position of field where charging knights meet
+    public Transform playerStartPosition;       // Transform marking thhe player's start position
+    public Transform opponentStartPosition;     // Transform marking the opponent's start position
+
 
     [Header("Round Settings")]
     public float countdownTime = 3f;           // Duration of the pre-round countdown
@@ -24,6 +30,9 @@ public class JoustGameManager : MonoBehaviour
 
     private void Start()
     {
+        playerKnight.startPoint = playerStartPosition;
+        opponentKnight.startPoint = opponentStartPosition;
+
         StartRound(); // Begin first round on game start
     }
 
@@ -36,8 +45,13 @@ public class JoustGameManager : MonoBehaviour
         roundTimer = 0f;
         roundActive = false;
 
-        ui.HideResultText();    // Clear previous round text
-        ui.SetTimingBarDifficulty(currentOpponent); // Set timing bar difficulty
+        // Reset UI
+        ui.HideResultText();
+
+        // Reset knight positions
+        playerKnight.ResetKnight();
+        opponentKnight.ResetKnight();
+
         ui.ShowCountdown(countdownTime, BeginJoust);   // Countdown before jousst
     }
 
@@ -55,6 +69,10 @@ public class JoustGameManager : MonoBehaviour
         timingBar.OnMarkerStopped += HandleMarkerResult;
 
         roundTimer = 0f;
+
+        // Start both knights charging towad the center
+        playerKnight.StartCharge(centerPosition.position);
+        opponentKnight.StartCharge(centerPosition.position);
     }
 
     // Update is called once per frame
