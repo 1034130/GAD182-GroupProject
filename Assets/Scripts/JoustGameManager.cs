@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 
 /// <summary>
@@ -16,6 +17,10 @@ public class JoustGameManager : MonoBehaviour
     public Transform centerPosition;            // Center position of field where charging knights meet
     public Transform playerStartPosition;       // Transform marking thhe player's start position
     public Transform opponentStartPosition;     // Transform marking the opponent's start position
+
+    [Header("Timing Bar Settings")]
+    public float baseSpeed = 100f;              // Speed for first opponent
+    public float speedIncreasePerOpponent = 50f;// Speed increase per opponent
 
 
     [Header("Round Settings")]
@@ -66,9 +71,7 @@ public class JoustGameManager : MonoBehaviour
         roundActive = true;
 
         // Increase difficulty by speeding up the marker slightly each round
-        float speed = 0.8f + (currentOpponent - 1) * 0.1f;
-
-        timingBar.StartBar(speed);
+        timingBar.StartBar();
         timingBar.OnMarkerStopped += HandleMarkerResult;
 
         roundTimer = 0f;

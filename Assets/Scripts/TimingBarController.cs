@@ -4,33 +4,29 @@ using UnityEngine;
 
 
 /// <summary>
-/// Controls the horizontal timing bar mechanic used in the jousting game.
-/// Moves a marker across a fixed bar and evaluates player input based on predefined zones.
-/// Now works with one static bar image (including green zone and sweet spot) and a separate marker.
+/// Moves a UI marker (RectTransform) back and forth between two positions on the timing bar.
+/// Evaluates input based on distance to sweet spot in normalized space.
 /// </summary>
 public class TimingBarController : MonoBehaviour
 {
     [Header("UI References")]
     public RectTransform marker;        // The moving marker (e.g., a small arrow or box)
-    public RectTransform barArea;       // The full width of the timing bar container
+    public RectTransform startPoint;    // Left point of the bar
+    public RectTransform endPoint;      // Right point of the bar
+    public RectTransform greenZoneStart;// Left point of the green zone
+    public RectTransform greenZoneEnd;  // Right point of the green zone
+    public RectTransform sweetSpotStart;// Left point of the sweet spot
+    public RectTransform sweetSpotEnd;  // Right point of the sweet spot
 
-    [Header("Timing Settings")]
-    public float markerSpeed = 1.0f;    // How fast the marker moves (in normalized units per second
-    public bool isMoving = false;       // Whether the marker is currently moving
-        
-    private float barWidth;             // Cached width of the barArea for calculations
-    private float markerProgress;       // 0 to 1 progress across the bar (0 = left, 1 = right
+    [Header("Movement Settings")]
 
-    [Header("Zone Settings")]
-    [Range(0f, 1f)]
-    public float greenZoneStart = 0.45f;    // Normalised start position of green zone
-    [Range(0f, 1f)]
-    public float greenZoneEnd = 0.55f;      // Normalised end position of green zone
-    [Range(0f, 1f)]
-    public float sweetSpotCenter = 0.5f;    // Normalised center of sweet spot
-    public float sweetSpotRange = 0.02f;    // Range around center of sweet spot
+    public float markerSpeed = 1f;    // How fast the marker moves (in normalized units per second
+    public bool isMoving = false;       // Whether the marker is actively moving
 
-
+    private float timeCounter = 0f;     // Time counter for PingPong motion
+    private float totalDistance;
+   
+  
     // Delegate for broadcasting result once marker stops
     public System.Action<HitResult> OnMarkerStopped;
 
@@ -38,40 +34,31 @@ public class TimingBarController : MonoBehaviour
     public enum HitResult { Miss, GreenZone, SweetSpot }
 
     void Start()
-    {   
-        // Cache the width of the timing bar once on startup
-        barWidth = barArea.rect.width;
+    {
+        // Cache the inital anchored positoon as the left edge
+        totalDistance = Vector2.Distance(startPoint.anchoredPosition, endPoint.anchoredPosition);
     }
 
     void Update()
     {
         if (!isMoving) return;
 
-        // Move the marker from left to right based on speed and time
-        markerProgress += markerSpeed * Time.deltaTime;
+        timeCounter += Time.deltaTime * markerSpeed;
 
-        // Clamp to ensure it doesn't go past the end
-        markerProgress = Mathf.Clamp01(markerProgress);
-
-        // Update the marker's horizontal position on the bar using anchored position
-        float xPos = markerProgress * barWidth;
-        marker.anchoredPosition = new Vector2(xPos, marker.anchoredPosition.y);
-
-        // If the marker reaches the end without the player sopping it, auto-evaluate
-        if (markerProgress >= 1f)
-        {
-            StopAndEvaluate();
-        }
+        // Calculate back and forth motion between 0 and moveDistance
+        float t = Mathf.PingPong(timeCounter, 1f);
+        marker.anchoredPosition = Vector2.Lerp(startPoint.anchoredPosition, endPoint.anchoredPosition, t);
+        
     }
 
     /// <summary>
     /// Begins the timing bar movement from left to right.
     /// </summary>
     /// <param name="speed">How fast the marker moves (higher = more difficult)</param>
-    public void StartBar(float speed)
+    public void StartBar()
     {
-        markerSpeed = speed;
-        markerProgress = 0f;
+        timeCounter = 0f;
+        marker.anchoredPosition = startPoint.anchoredPosition; 
         isMoving = true;
     }
 
@@ -83,23 +70,21 @@ public class TimingBarController : MonoBehaviour
     {
         isMoving = false;
 
-        float markerNormalizedPosition = markerProgress; // Already 0-1
+        float markerX = marker.anchoredPosition.x;
+
+        float greenStart = greenZoneStart.anchoredPosition.x;
+        float greenEnd = greenZoneEnd.anchoredPosition.x;
+        float sweetStart = sweetSpotStart.anchoredPosition.x;
+        float sweetEnd = sweetSpotEnd.anchoredPosition.x;
 
         HitResult result;
 
-        if (markerNormalizedPosition >= (sweetSpotCenter - sweetSpotRange) &&
-              markerNormalizedPosition <= (sweetSpotCenter + sweetSpotRange))
-        {
+        if (markerX >= sweetStart && markerX <= sweetEnd)
             result = HitResult.SweetSpot;
-        }
-        else if (markerNormalizedPosition >= greenZoneStart && markerNormalizedPosition <= greenZoneEnd)
-        {
+        else if (markerX >= greenStart && markerX <= greenEnd)
             result = HitResult.GreenZone;
-        }
         else
-        {
             result = HitResult.Miss;
-        }
 
         OnMarkerStopped?.Invoke(result);
     }

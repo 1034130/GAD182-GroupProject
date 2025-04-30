@@ -96,18 +96,21 @@ public class JoustUiController : MonoBehaviour
             easyTimingBar.SetActive(true);
             mediumTimingBar.SetActive(false);
             hardTimingBar.SetActive(false);
+            FindObjectOfType<JoustGameManager>().timingBar = easyTimingBar.GetComponent<TimingBarController>();
         }
         else if (opponentRank <= 4)
         {
             easyTimingBar.SetActive(false);
             mediumTimingBar.SetActive(true);
             hardTimingBar.SetActive(false);
+            FindObjectOfType<JoustGameManager>().timingBar = mediumTimingBar.GetComponent<TimingBarController>();
         }
         else
         {
             easyTimingBar.SetActive(false);
             mediumTimingBar.SetActive(false);
             hardTimingBar.SetActive(true);
+            FindObjectOfType<JoustGameManager>().timingBar = hardTimingBar.GetComponent<TimingBarController>();
         }
     }
 }
