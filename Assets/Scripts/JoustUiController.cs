@@ -14,6 +14,8 @@ public class JoustUiController : MonoBehaviour
     public TextMeshProUGUI countdownText;   // Displays countdown at the start of each round
     public TextMeshProUGUI resultText;      // Dispalys round result ("You Won!" etc)
     public TextMeshProUGUI crownsEarnedText;// Dispalys total Royal Crowns
+    public TextMeshProUGUI matchText;       // Displays current match number
+    public TextMeshProUGUI roundText;       // Displays current round number
 
     [Header("Timing Bars")]
     public GameObject easyTimingBar;        // Easy difficulty timing bar
@@ -112,6 +114,20 @@ public class JoustUiController : MonoBehaviour
             hardTimingBar.SetActive(true);
             FindObjectOfType<JoustGameManager>().timingBar = hardTimingBar.GetComponent<TimingBarController>();
         }
+    }
+
+    public void UpdateMatchAndRound(int matchNumber, int roundNumber)
+    {
+        if (matchText != null)
+            matchText.text = $"Match {matchNumber}/6";
+
+        if (roundText != null)
+            roundText.text = $"Round {roundNumber}";
+    }
+
+    public void UpdateCrownDisplay(int crowns)
+    {
+        crownsEarnedText.text = "Crowns: " + crowns.ToString();
     }
 }
 
