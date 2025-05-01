@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 /// <summary>
 /// Controls the core gameplay loop of the jousting game.
@@ -17,6 +18,7 @@ public class JoustGameManager : MonoBehaviour
     public Transform centerPosition;            // Center position of field where charging knights meet
     public Transform playerStartPosition;       // Transform marking thhe player's start position
     public Transform opponentStartPosition;     // Transform marking the opponent's start position
+
     private bool flipSides = false;             // Tracks which side each knight is on
     private int roundCounter = 1;               // Resets each new opponent
     private int totalCrowns = 0;                // Resets after
@@ -32,17 +34,20 @@ public class JoustGameManager : MonoBehaviour
     public float contactTime = 3f;             // Max time player has to input before automatic dismount
     public int totalOpponents = 6;             // Number of opponents needed to win championship
 
-    private float roundTimer = 0f;             // Tracks time since round began
-    private bool roundActive = false;          // Whether the round is currently active
-    private bool inputReceived = false;        // Tracks if player has already pressed space
-    private int currentOpponent = 1;           // Current opponent index (1 = easiest)
 
     [Header("Timing Delays")]
     public float delayAfterRound = 3f;      // Delay between rounds (win, draw)
     public float delayAfterChampionship = 5f; // Delay after championship win
 
+    private float roundTimer = 0f;             // Tracks time since round began
+    private bool roundActive = false;          // Whether the round is currently active
+    private bool inputReceived = false;        // Tracks if player has already pressed space
+    private int currentOpponent = 1;           // Current opponent index (1 = easiest)
+
     private void Start()
     {
+       ui.restartButton.onClick.AddListener(RestartGame);
+       ui.mainMenuButton.onClick.AddListener(ReturnToMainMenu);
        StartRound(); // Begin first round on game start
     }
 
@@ -51,6 +56,8 @@ public class JoustGameManager : MonoBehaviour
     /// </summary>
     public void StartRound()
     {
+        Time.timeScale = 1f;
+
         Transform playerStart = flipSides ? opponentStartPosition : playerStartPosition;
         Transform opponentStart = flipSides ? playerStartPosition : opponentStartPosition;
 
@@ -71,6 +78,8 @@ public class JoustGameManager : MonoBehaviour
         // Reset knight positions
         playerKnight.ResetKnight();
         opponentKnight.ResetKnight();
+
+        timingBar.ResetMarkerPosition();
 
         ui.ShowCountdown(countdownTime, BeginJoust);   // Countdown before joust
     }
@@ -189,15 +198,16 @@ public class JoustGameManager : MonoBehaviour
     /// </summary>
     private void HandleRoundLoss()
     {
-        ui.ShowResultText("You were dismounted! Returning to the start...");
+        ui.ShowResultText("You were dismounted!");
 
         totalCrowns = championBonus;    // Only keep champion bonus
         ui.UpdateCrownDisplay(totalCrowns);
 
         currentOpponent = 1;
         roundCounter = 1;
-        Invoke(nameof(StartRound), delayAfterRound); ; // Restart from easiest opponent
         flipSides = false;              // Ensure player starts on correct side after restart
+
+        Invoke(nameof(ShowLossPostGame), delayAfterRound); ; // Restart from easiest opponent
     }
 
     private void HandleChampionshipWin()
@@ -206,10 +216,40 @@ public class JoustGameManager : MonoBehaviour
         totalCrowns += championBonus;
         ui.UpdateCrownDisplay(totalCrowns);
 
-        ui.ShowResultText("You are the Champion! Returning to the beginning");
+        ui.ShowResultText("You are the Champion!\nRelish in your spoils!");
         currentOpponent = 1;
         roundCounter++;
         flipSides = false;
-        Invoke(nameof(StartRound), delayAfterChampionship);  // Restart game loop
+        Invoke(nameof(ShowChampionshipPostGame), delayAfterChampionship);  // Restart game loop
     }
+
+    private void ShowLossPostGame()
+    {
+        Time.timeScale = 0f;
+        ui.ShowPostGameMenu("You were dismounted!");
+    }
+
+    private void ShowChampionshipPostGame()
+    {
+        Time.timeScale = 0f;
+        ui.ShowPostGameMenu("You are the Champion!\nRelish in your spoils!");
+    }
+
+    private void RestartGame()
+    {
+        totalCrowns = 0;
+        championBonus = 0;
+        currentOpponent = 1;
+        roundCounter = 1;
+        flipSides = false;
+
+        ui.HidePostGameMenu();
+        StartRound();
+    }
+
+    private void ReturnToMainMenu()
+    {
+        SceneManager.LoadScene("MainMenu");
+    }
+
 }

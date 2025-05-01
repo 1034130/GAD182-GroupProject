@@ -96,4 +96,10 @@ public class TimingBarController : MonoBehaviour
     {
         StopAndEvaluate();
     }
+
+    public void ResetMarkerPosition()
+    {
+        timeCounter = 0f;
+        marker.anchoredPosition = startPoint.anchoredPosition;
+    }
 }

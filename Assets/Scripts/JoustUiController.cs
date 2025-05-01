@@ -24,8 +24,11 @@ public class JoustUiController : MonoBehaviour
 
     private Coroutine countdownCoroutine;
 
-
-
+    [Header("Post Game Menu")]
+    public GameObject postGameMenu;
+    public TextMeshProUGUI postGameTitle;
+    public Button restartButton;
+    public Button mainMenuButton;
 
 
 
@@ -128,6 +131,17 @@ public class JoustUiController : MonoBehaviour
     public void UpdateCrownDisplay(int crowns)
     {
         crownsEarnedText.text = "Crowns: " + crowns.ToString();
+    }
+
+    public void ShowPostGameMenu(string message)
+    {
+        postGameMenu.SetActive(true);
+        postGameTitle.text = message;
+    }
+
+    public void HidePostGameMenu()
+    {
+        postGameMenu.SetActive(false);
     }
 }
 
