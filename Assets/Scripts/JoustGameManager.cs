@@ -189,7 +189,7 @@ public class JoustGameManager : MonoBehaviour
     /// </summary>
     private void HandleRoundLoss()
     {
-        ui.ShowResultText("You were dismount! Returning to the start...");
+        ui.ShowResultText("You were dismounted! Returning to the start...");
 
         totalCrowns = championBonus;    // Only keep champion bonus
         ui.UpdateCrownDisplay(totalCrowns);
@@ -206,8 +206,7 @@ public class JoustGameManager : MonoBehaviour
         totalCrowns += championBonus;
         ui.UpdateCrownDisplay(totalCrowns);
 
-        ui.ShowResultText("You are the Champion! +100 Crowns & a new Knight skin!");
-        // TODO: Add crown reward and unlock skin
+        ui.ShowResultText("You are the Champion! Returning to the beginning");
         currentOpponent = 1;
         roundCounter++;
         flipSides = false;
