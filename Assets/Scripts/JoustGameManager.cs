@@ -15,7 +15,8 @@ public class JoustGameManager : MonoBehaviour
     public JoustUiController ui;                // UI controller for displaying countdowns and results
     public KnightMovement playerKnight;         // Controller for Knight movement (Player knight)
     public KnightMovement opponentKnight;       // Controller for Knight movement (Opponent knight)
-    public Transform centerPosition;            // Center position of field where charging knights meet
+    public Transform side1CenterPoint;         // Point that player charges toward
+    public Transform side2CenterPoint;       // Point that opponent charges toward
     public Transform playerStartPosition;       // Transform marking thhe player's start position
     public Transform opponentStartPosition;     // Transform marking the opponent's start position
 
@@ -98,8 +99,11 @@ public class JoustGameManager : MonoBehaviour
         roundTimer = 0f;
 
         // Start both knights charging towad the center
-        playerKnight.StartCharge(centerPosition.position);
-        opponentKnight.StartCharge(centerPosition.position);
+        Transform playerTarget = flipSides ? side2CenterPoint : side1CenterPoint;
+        Transform opponentTarget = flipSides ? side1CenterPoint : side2CenterPoint;
+
+        playerKnight.StartCharge(playerTarget.position);
+        opponentKnight.StartCharge(opponentTarget.position);
     }
 
     // Update is called once per frame
@@ -164,7 +168,7 @@ public class JoustGameManager : MonoBehaviour
 
         ui.ShowResultText(guaranteed ?
             "Perfect hit! You dismounteed your opponent!" :
-            "You held steady and dismounted them!");
+            "You held steady and dismounted your opponent!");
 
         currentOpponent++;
         roundCounter = 1;   // Reset round counter on new match
