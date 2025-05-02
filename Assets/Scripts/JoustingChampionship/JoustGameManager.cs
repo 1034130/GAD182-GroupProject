@@ -211,9 +211,12 @@ public class JoustGameManager : MonoBehaviour
         roundCounter = 1;
         flipSides = false;              // Ensure player starts on correct side after restart
 
-        Invoke(nameof(ShowLossPostGame), delayAfterRound); ; // Restart from easiest opponent
+        Invoke(nameof(ShowLossPostGame), delayAfterRound); // Restart from easiest opponent
     }
 
+    /// <summary>
+    /// Called after final opponent is defeated. Adds champion reward and pauses game.
+    /// </summary>
     private void HandleChampionshipWin()
     {
         championBonus = 500;
@@ -227,18 +230,27 @@ public class JoustGameManager : MonoBehaviour
         Invoke(nameof(ShowChampionshipPostGame), delayAfterChampionship);  // Restart game loop
     }
 
+    /// <summary>
+    /// Shows the loss postgame screen and pauses the game.
+    /// </summary>
     private void ShowLossPostGame()
     {
         Time.timeScale = 0f;
         ui.ShowPostGameMenu("You were dismounted!");
     }
 
+    /// <summary>
+    /// Shows the championship win postgame screen and pauses the game.
+    /// </summary>
     private void ShowChampionshipPostGame()
     {
         Time.timeScale = 0f;
         ui.ShowPostGameMenu("You are the Champion!\nRelish in your spoils!");
     }
 
+    /// <summary>
+    /// Fully resets game state after restart from postgame menu.
+    /// </summary>
     private void RestartGame()
     {
         totalCrowns = 0;
@@ -251,6 +263,9 @@ public class JoustGameManager : MonoBehaviour
         StartRound();
     }
 
+    /// <summary>
+    /// Loads the central main menu scene for the minigame collection.
+    /// </summary>
     private void ReturnToMainMenu()
     {
         SceneManager.LoadScene("MainMenu");

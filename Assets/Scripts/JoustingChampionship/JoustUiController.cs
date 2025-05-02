@@ -22,13 +22,13 @@ public class JoustUiController : MonoBehaviour
     public GameObject mediumTimingBar;      // Medium difficulty timing bar
     public GameObject hardTimingBar;        // Hard difficulty timing bar
 
-    private Coroutine countdownCoroutine;
+    private Coroutine countdownCoroutine;   // Tracks active countdown coroutine
 
     [Header("Post Game Menu")]
-    public GameObject postGameMenu;
-    public TextMeshProUGUI postGameTitle;
-    public Button restartButton;
-    public Button mainMenuButton;
+    public GameObject postGameMenu;         // Parent UI for post-game menu (restart/main menu)
+    public TextMeshProUGUI postGameTitle;   // Title message shown on post-game menu
+    public Button restartButton;            // Restart game button
+    public Button mainMenuButton;           // Return to main menu button
 
 
 
@@ -119,6 +119,9 @@ public class JoustUiController : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Updates match and round text values in the UI.
+    /// </summary>
     public void UpdateMatchAndRound(int matchNumber, int roundNumber)
     {
         if (matchText != null)
@@ -128,17 +131,25 @@ public class JoustUiController : MonoBehaviour
             roundText.text = $"Round {roundNumber}";
     }
 
+    /// <summary>
+    /// Alias for updating crown text display (used by GameManager).
+    /// </summary>
     public void UpdateCrownDisplay(int crowns)
     {
         crownsEarnedText.text = "Crowns: " + crowns.ToString();
     }
 
+    /// <summary>
+    /// Shows the post-game menu with a given title message.
+    /// </summary>
     public void ShowPostGameMenu(string message)
     {
         postGameMenu.SetActive(true);
         postGameTitle.text = message;
     }
-
+    /// <summary>
+    /// Hides the post-game menu UI.
+    /// </summary>
     public void HidePostGameMenu()
     {
         postGameMenu.SetActive(false);
