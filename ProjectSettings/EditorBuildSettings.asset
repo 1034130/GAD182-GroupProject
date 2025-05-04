@@ -6,7 +6,7 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Scenes/RoyalTourneryMainMenu.unity
+    path: Assets/Scenes/RoyalTourneyMainMenu.unity
     guid: d23d731f75504b746a19ac7589aa6982
   - enabled: 1
     path: Assets/Scenes/Jousting Championship/MainMenu.unity
@@ -14,4 +14,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Jousting Championship/JoustScene.unity
     guid: 9fc0d4010bbf28b4594072e72b8655ab
+  - enabled: 1
+    path: Assets/Scenes/Blacksmithing/Blacksmithing.unity
+    guid: 447de27b02d79124f8d042ef76cfa916
   m_configObjects: {}

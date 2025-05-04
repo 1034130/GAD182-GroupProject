@@ -16,7 +16,7 @@ public class ClickerCrusadersMenu : MonoBehaviour
     {
         joustingChampionshipButton.onClick.AddListener(() => LoadGame("MainMenu"));
         miningButton.onClick.AddListener(() => LoadGame("MiningGameMenu"));
-        blacksmithingButton.onClick.AddListener(() => LoadGame("BlacksmithingMenu"));
+        blacksmithingButton.onClick.AddListener(() => LoadGame("Blacksmithing"));
         exitButton.onClick.AddListener(QuitGame);
         
     }
