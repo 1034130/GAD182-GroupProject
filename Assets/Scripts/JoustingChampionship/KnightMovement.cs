@@ -8,19 +8,41 @@ using UnityEngine;
 /// </summary>
 public class KnightMovement : MonoBehaviour
 {
+    [Header("Movement")]
     public float chargeSpeed = 5f;      // Knight charging speed
-    private Vector3 targetPosition;        // Where the knight charges toward
+    public Transform startPoint;        // Reference to an externally assigned starting position
+    private Vector3 targetPosition;     // Where the knight charges toward
     private bool isCharging = false;
 
-    // Reference to an externally assigned starting position
-    public Transform startPoint;
+    [Header("Sprites")]
+    public Sprite idleSide1;
+    public Sprite chargeSide1;
+    public Sprite idleSide2;
+    public Sprite chargeSide2;
 
-    void Update()
+    private SpriteRenderer spriteRenderer;
+    private bool isSide1 = true;
+
+    private void Awake()
+    {
+        spriteRenderer = GetComponent<SpriteRenderer>();
+    }
+
+    private void Update()
     {
         if (!isCharging) return;
 
-        // Move toward target position
         transform.position = Vector3.MoveTowards(transform.position, targetPosition, chargeSpeed * Time.deltaTime);
+        // We no longer reset the sprite when reaching the destination
+    }
+
+    ///<summary>
+    ///Called by GameManager to set the knight's side (for flipping sprite variation).
+    ///</summary>
+    public void SetSide(bool side1)
+    {
+        isSide1 = side1;
+        UpdateSprite(false);
     }
 
     ///<summary>
@@ -39,5 +61,39 @@ public class KnightMovement : MonoBehaviour
     {
         transform.position = startPoint.position;
         isCharging = false;
+        UpdateSprite(false);
+    }
+
+    ///<summary>
+    ///Applies the correct sprite based on charge state and side.
+    ///</summary>
+    private void UpdateSprite(bool charging)
+    {
+        if (charging)
+            spriteRenderer.sprite = isSide1 ? chargeSide1 : chargeSide2;
+        else
+            spriteRenderer.sprite = isSide1 ? idleSide1 : idleSide2;
+    }
+
+    /// <summary>
+    /// Allows external control of sprite change to charging state (used by GameManager).
+    /// </summary>
+    public void SetCharging(bool charging)
+    {
+        isCharging = charging;
+        UpdateSprite(charging);
+    }
+
+    ///<summary>
+    ///Applies a new sprite set (called when selected knight changes).
+    ///</summary>
+    public void AssignSpriteSet(KnightSpriteSet newSet)
+    {
+        idleSide1 = newSet.idleSide1;
+        chargeSide1 = newSet.chargeSide1;
+        idleSide2 = newSet.idleSide2;
+        chargeSide2 = newSet.chargeSide2;
+
+        UpdateSprite(false);    // Update to idle immediately
     }
 }

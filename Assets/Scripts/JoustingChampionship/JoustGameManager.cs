@@ -45,6 +45,9 @@ public class JoustGameManager : MonoBehaviour
     private bool inputReceived = false;        // Tracks if player has already pressed space
     private int currentOpponent = 1;           // Current opponent index (1 = easiest)
 
+    [Header("Opponent Sprite Sets")]
+    public KnightSpriteSet[] opponentSprites;
+
     private void Start()
     {
        ui.restartButton.onClick.AddListener(RestartGame);
@@ -57,6 +60,15 @@ public class JoustGameManager : MonoBehaviour
     /// </summary>
     public void StartRound()
     {
+        // Assign player's chosen sprite set from KnightSelector
+        playerKnight.AssignSpriteSet(KnightSelector.SelectedKnightSet);
+
+        bool playerIsSide1 = !flipSides;
+
+        playerKnight.SetSide(playerIsSide1);
+        opponentKnight.SetSide(!playerIsSide1);
+
+
         Time.timeScale = 1f;
 
         Transform playerStart = flipSides ? opponentStartPosition : playerStartPosition;
@@ -104,6 +116,8 @@ public class JoustGameManager : MonoBehaviour
 
         playerKnight.StartCharge(playerTarget.position);
         opponentKnight.StartCharge(opponentTarget.position);
+        playerKnight.SetCharging(true);
+        opponentKnight.SetCharging(true);
     }
 
     // Update is called once per frame
@@ -174,6 +188,16 @@ public class JoustGameManager : MonoBehaviour
         roundCounter = 1;   // Reset round counter on new match
 
         // Player becomes champion if all opponents are defeated
+        if (currentOpponent <= totalOpponents)
+        {
+            KnightSpriteSet chosenSet = opponentSprites[Random.Range(0, opponentSprites.Length)];
+            opponentKnight.idleSide1 = chosenSet.idleSide1;
+            opponentKnight.chargeSide1 = chosenSet.chargeSide1;
+            opponentKnight.idleSide2 = chosenSet.idleSide2;
+            opponentKnight.chargeSide2 = chosenSet.chargeSide2;
+
+        }
+
         if (currentOpponent > totalOpponents)
         {
             HandleChampionshipWin();
